@@ -4,7 +4,7 @@
 class Foo {
 
 private:
-    static Foo* m_instance;
+    static std::shared_ptr<Foo> m_instance;
     std::string m_clientName;
 
 protected:
@@ -15,7 +15,7 @@ public:
     Foo(Foo& other) = delete;
     void operator=(const Foo&) = delete;
 
-    static Foo* getInstance(const std::string& clientName);
+    static std::shared_ptr<Foo> getInstance(const std::string& clientName);
 
     void TestFunc()
     {
@@ -23,12 +23,12 @@ public:
     }
 };
 
-Foo* Foo::m_instance = nullptr;
-Foo* Foo::getInstance(const std::string& clientName)
+std::shared_ptr<Foo> Foo::m_instance = nullptr;
+std::shared_ptr<Foo> Foo::getInstance(const std::string& clientName)
 {
     if (m_instance == nullptr)
     {
-        m_instance = new Foo(clientName);
+        m_instance = std::shared_ptr<Foo>( new Foo(clientName));
     }
 
     return m_instance;
@@ -40,9 +40,11 @@ int main() {
     //auto FooObj = Foo::getInstance("ClientA");
     //FooObj->TestFunc();
 
-    auto getSingleton = [](const std::string& clientName) -> Foo* {
-        auto FooObje = Foo::getInstance(clientName);
-        FooObje->TestFunc();
+    auto getSingleton = [](const std::string& clientName) -> std::shared_ptr<Foo> {
+        auto FooObj = Foo::getInstance(clientName);
+        FooObj->TestFunc();
+
+        return FooObj;
     };
 
     std::thread thread1(getSingleton, "thread1");
