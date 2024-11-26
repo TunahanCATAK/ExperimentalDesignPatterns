@@ -11,6 +11,12 @@ class PersonBuilder;
 
 class Person {
 
+    // the friend declaration is important
+    // because of default ctor is private and
+    // PersonBuilder has to access that.
+    friend PersonBuilder;
+    Person() = default;
+
 public:
     std::string m_street_address;
     std::string m_post_code;
@@ -20,9 +26,11 @@ public:
     std::string m_position;
     int m_annual_income = 0;
 
+    // this create() function causes semantically
+    // circular dependency. So, we have to use forward declaration
+    // for PersonBuilder class. We can't include PersonBuilder.h.
     static PersonBuilder create();
 
-    Person() = default;
     Person(const Person&) = default;
     Person(Person&&) = default;
 
